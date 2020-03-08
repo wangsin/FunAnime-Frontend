@@ -1,21 +1,19 @@
 <template>
-  <el-header class="basic">
-    <el-menu :default-active="headListDefault.toString()" mode="horizontal" @select="1">
-      <el-menu-item><img id="main-logo" src="../assets/ele-icon.svg" alt="logo" /></el-menu-item>
-      <el-menu-item v-for="head in headListData" :index="head.id.toString()" :key="head.title">
-        {{head.title}}
-      </el-menu-item>
-      <el-menu-item class="menu-right">
-        <el-button type="primary" plain>注册</el-button>
-        <el-button type="primary">登录</el-button>
-      </el-menu-item>
-      <el-menu-item class="menu-right">
-        <el-input placeholder="Just Search" v-model="searchData" class="input-with-select">
-          <el-button slot="append" icon="el-icon-search"></el-button>
-        </el-input>
-      </el-menu-item>
-    </el-menu>
-  </el-header>
+  <el-menu :default-active="headListDefault.toString()" mode="horizontal" @select="1">
+    <el-menu-item><img id="main-logo" src="../assets/funanime-logo.svg" alt="logo" /></el-menu-item>
+    <el-menu-item v-for="head in headListData" :index="head.id.toString()" :key="head.title">
+      {{head.title}}
+    </el-menu-item>
+    <el-menu-item class="menu-right">
+      <el-button type="primary" plain>注册</el-button>
+      <el-button type="primary">登录</el-button>
+    </el-menu-item>
+    <el-menu-item class="menu-right">
+      <el-input placeholder="Just Search" v-model="searchData" class="input-with-select">
+        <el-button slot="append" icon="el-icon-search"></el-button>
+      </el-input>
+    </el-menu-item>
+  </el-menu>
 </template>
 
 <script>
