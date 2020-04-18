@@ -1,7 +1,7 @@
 <template>
-  <el-menu :default-active="headListDefault.toString()" mode="horizontal" @select="1">
+  <el-menu :default-active="headListDefault" mode="horizontal" :select="1" :router="routerSwitch">
     <el-menu-item><img id="main-logo" src="../assets/funanime-logo.svg" alt="logo" /></el-menu-item>
-    <el-menu-item v-for="head in headListData" :index="head.id.toString()" :key="head.title">
+    <el-menu-item v-for="head in headListData" :index="head.router" :key="head.title">
       {{head.title}}
     </el-menu-item>
     <el-menu-item class="menu-right">
@@ -24,22 +24,20 @@ export default {
       searchData: '',
       headListData: [
         {
-          id: 1,
           title: '主页',
-          router: ''
+          router: '/'
         },
         {
-          id: 2,
           title: '番剧',
-          router: 'anime'
+          router: '/anime'
         },
         {
-          id: 3,
           title: '科技',
-          router: 'tech'
+          router: '/tech'
         }
       ],
-      headListDefault: 1
+      headListDefault: '/',
+      routerSwitch: true
     }
   }
 }

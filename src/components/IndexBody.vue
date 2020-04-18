@@ -1,17 +1,8 @@
 <template>
-    <el-main>
-      <el-row :gutter="5">
-        <el-col :span="16">
-          <el-card class="main-pic"></el-card>
-        </el-col>
-        <el-col :span="8" style="height: 100%">
-          <div style="height: 50%">
-            <el-card class="single-box"></el-card>
-            <el-card class="single-box"></el-card>
-          </div>
-        </el-col>
-      </el-row>
-    </el-main>
+    <div class="head-show">
+      <img src="../assets/BS_PIC_2020-03-02-19-11-59.png" alt="" class="img">
+      <div class="head-img-desc">{{currentDate}}</div>
+    </div>
 </template>
 
 <script>
@@ -26,15 +17,27 @@ export default {
 </script>
 
 <style scoped>
-  .main-pic {
-    height: 100%;
+  .head-show {
+    padding-top: 0;
+    height: 400px;
+    margin: 0 10%;
+    /*background-color: #8c8c;*/
+    border: #000;
   }
 
-  .single-box {
-    display: flex;
-    flex-direction: column;
-    position: relative;
+  .head-pic {
     height: 100%;
-    width: 100%;
+    margin: 0 10%;
+    background-color: #000000;
+  }
+
+  .img {
+    height: 100%;
+    float: left;
+  }
+
+  .head-img-desc {
+    background: #fff;
+    float: left;
   }
 </style>
