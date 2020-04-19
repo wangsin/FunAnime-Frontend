@@ -1,12 +1,12 @@
 <template>
-  <el-menu :default-active="headListDefault" mode="horizontal" :select="1" :router="routerSwitch">
+  <el-menu :default-active="headListDefault" mode="horizontal" :select="1" :router="routerSwitch" id="nav">
     <el-menu-item><img id="main-logo" src="../assets/funanime-logo.svg" alt="logo" /></el-menu-item>
     <el-menu-item v-for="head in headListData" :index="head.router" :key="head.title">
       {{head.title}}
     </el-menu-item>
     <el-menu-item class="menu-right">
       <el-button type="primary" plain>注册</el-button>
-      <el-button type="primary">登录</el-button>
+      <el-button type="primary" @click="$router.push('/login')">登录</el-button>
     </el-menu-item>
     <el-menu-item class="menu-right">
       <el-input placeholder="Just Search" v-model="searchData" class="input-with-select">
@@ -19,6 +19,9 @@
 <script>
 export default {
   name: 'IndexHeader',
+  mounted: function () {
+    console.log(this.$router)
+  },
   data () {
     return {
       searchData: '',
@@ -39,6 +42,8 @@ export default {
       headListDefault: '/',
       routerSwitch: true
     }
+  },
+  method: {
   }
 }
 </script>
@@ -46,6 +51,10 @@ export default {
 <style>
   #main-logo {
     height: 90%;
+  }
+
+  #nav {
+    flex-wrap: nowrap;
   }
 
   .basic {

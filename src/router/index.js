@@ -14,6 +14,11 @@ export default new Router({
       path: '/anime',
       name: 'AnimePage',
       component: () => import(/* webpackChunkName: "video" */ '@/components/AnimePage')
+    },
+    {
+      path: '/login',
+      name: 'LoginPage',
+      component: () => import(/* webpackChunkName: "video" */ '@/components/LoginPage')
     }
   ]
 })
