@@ -19,6 +19,16 @@ export default new Router({
       path: '/login',
       name: 'LoginPage',
       component: () => import(/* webpackChunkName: "video" */ '@/components/LoginPage')
+    },
+    {
+      path: '/register',
+      name: 'RegisterPage',
+      component: () => import(/* webpackChunkName: "video" */ '@/components/RegisterPage')
+    },
+    {
+      path: '/supple',
+      name: 'SupplePage',
+      component: () => import(/* webpackChunkName: "video" */ '@/components/SupplePage')
     }
   ]
 })

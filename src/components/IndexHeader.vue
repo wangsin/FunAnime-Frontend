@@ -5,7 +5,7 @@
       {{head.title}}
     </el-menu-item>
     <el-menu-item class="menu-right">
-      <el-button type="primary" plain>注册</el-button>
+      <el-button type="primary" @click="$router.push('/register')" plain>注册</el-button>
       <el-button type="primary" @click="$router.push('/login')">登录</el-button>
     </el-menu-item>
     <el-menu-item class="menu-right">

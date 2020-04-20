@@ -7,12 +7,12 @@
 
         <div class="rightArea">
             <div class="title">登录</div>
-            <el-input v-model="username" placeholder="用户名" v-if="passwordMethod" class="inputArea"></el-input>
+            <el-input v-model="username" placeholder="手机号/邮箱" v-if="passwordMethod" class="inputArea"></el-input>
             <el-input v-model="password" placeholder="密码" v-if="passwordMethod" class="inputArea" show-password>
                 <el-button slot="append" icon="el-icon-question">忘记密码</el-button>
             </el-input>
-            <el-input v-model="username" placeholder="手机号" v-if="verifyCodeMethod" class="inputArea"></el-input>
-            <el-input v-model="password" placeholder="验证码" v-if="verifyCodeMethod" class="inputArea" show-password>
+            <el-input v-model="phone" placeholder="手机号" v-if="verifyCodeMethod" class="inputArea"></el-input>
+            <el-input v-model="verifyCode" placeholder="验证码" v-if="verifyCodeMethod" class="inputArea" show-password>
                 <el-button slot="append" icon="el-icon-refresh-right">获取验证码</el-button>
             </el-input>
             <el-checkbox v-model="checked" class="checkArea">记住我</el-checkbox>
@@ -36,6 +36,8 @@ export default {
     return {
       username: '',
       password: '',
+      phone: '',
+      verifyCode: '',
       checked: true,
       verifyCodeMethod: false,
       passwordMethod: true,
