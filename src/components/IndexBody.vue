@@ -23,8 +23,11 @@
       </div>
     </el-container>
     <div class="top">
-      <el-row :gutter="20" class="subCard">
-        <el-col :xs="24" :sm="6" :md="6" v-for="i in 24" :key="i">
+      <el-row :gutter="20" class="subCard"
+              v-infinite-scroll="load"
+              infinite-scroll-disabled="disabled"
+              infinite-scroll-distance="10">
+        <el-col :xs="24" :sm="6" :md="6" v-for="i in count" :key="i">
           <el-card :body-style="{ padding: '0px' }" shadow="hover" style="margin-bottom: 20px;">
             <img src="../assets/material.jpg" class="image">
             <div style="padding: 14px; display: flex; flex-direction: column;">
@@ -34,15 +37,8 @@
           </el-card>
         </el-col>
       </el-row>
-      <div class="block">
-        <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :page-size="6"
-          layout="prev, pager, next"
-          :total="total">
-        </el-pagination>
-      </div>
+      <p v-if="loading">加载中...</p>
+      <p v-if="noMore">没有更多了</p>
     </div>
   </div>
 </template>
@@ -53,20 +49,26 @@ export default {
   data () {
     return {
       currentDate: new Date(),
-      videos: [
-        {
-          id: 1,
-          avatar: '../assets/material.jpg',
-          title: 'fucker',
-          info: 'adofja;osifdoa;dsifh;oasdihfjo;alsijfdialkfdjoalskfd'
-        },
-        {
-          id: 2,
-          avatar: '../assets/material.jpg',
-          title: 'fucker',
-          info: 'adofja;osifdoa;dsifh;oasdihfjo;alsijfdialkfdjoalskfd'
-        }
-      ]
+      count: 12,
+      videos: [],
+      loading: false
+    }
+  },
+  computed: {
+    noMore () {
+      return this.count >= 40
+    },
+    disabled () {
+      return this.loading || this.noMore
+    }
+  },
+  methods: {
+    load () {
+      this.loading = true
+      setTimeout(() => {
+        this.count += 4
+        this.loading = false
+      }, 2000)
     }
   }
 }
@@ -107,6 +109,7 @@ a{
 .subCard {
   width: 100%;
   height: 100%;
+  overflow-y: auto;
 }
 
 .time {
