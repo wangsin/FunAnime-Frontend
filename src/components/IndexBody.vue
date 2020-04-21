@@ -1,8 +1,18 @@
 <template>
-    <div class="head-show">
-      <img src="../assets/BS_PIC_2020-03-02-19-11-59.png" alt="" class="img">
-      <div class="head-img-desc">{{currentDate}}</div>
+  <el-container class="indexRoot">
+    <div class="card">
+      <el-carousel class="mainCard" trigger="click" height="471px">
+        <el-carousel-item v-for="item in 4" :key="item">
+          <h3 class="small">{{ item }}</h3>
+        </el-carousel-item>
+      </el-carousel>
+      <el-carousel class="subCard" trigger="click" height="471px">
+        <el-carousel-item v-for="item in 4" :key="item">
+          <h3 class="small">{{ item }}</h3>
+        </el-carousel-item>
+      </el-carousel>
     </div>
+  </el-container>
 </template>
 
 <script>
@@ -17,27 +27,36 @@ export default {
 </script>
 
 <style scoped>
-  .head-show {
-    padding-top: 0;
-    height: 400px;
-    margin: 0 10%;
-    /*background-color: #8c8c;*/
-    border: #000;
-  }
+.el-carousel__item h3 {
+  color: #475669;
+  font-size: 14px;
+  opacity: 0.75;
+  line-height: 150px;
+  margin: 0;
+}
 
-  .head-pic {
-    height: 100%;
-    margin: 0 10%;
-    background-color: #000000;
-  }
+.el-carousel__item:nth-child(2n) {
+  background-color: #99a9bf;
+}
 
-  .img {
-    height: 100%;
-    float: left;
-  }
+.el-carousel__item:nth-child(2n+1) {
+  background-color: #d3dce6;
+}
 
-  .head-img-desc {
-    background: #fff;
-    float: left;
-  }
+.mainCard {
+  width: 70%;
+  /*margin: 0 4px 0 0;*/
+}
+
+.card {
+  display: flex;
+  flex-flow: row nowrap;
+  margin: 62px 100px 0 100px;
+  width: 100%;
+}
+
+.subCard {
+  width: 30%;
+  margin: 0 0 0 20px;
+}
 </style>

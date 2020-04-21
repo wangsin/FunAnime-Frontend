@@ -7,8 +7,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'MainPage',
-      component: () => import(/* webpackChunkName: "video" */ '@/components/MainPage')
+      name: 'IndexBody',
+      component: () => import(/* webpackChunkName: "video" */ '@/components/IndexBody')
     },
     {
       path: '/anime',
