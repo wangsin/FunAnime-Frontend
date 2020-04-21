@@ -4,14 +4,16 @@
       <index-header></index-header>
     </el-header>
     <router-view></router-view>
+<!--    <footer-page></footer-page>-->
   </div>
 </template>
 
 <script>
 import IndexHeader from './components/IndexHeader'
+import FooterPage from './components/FooterPage'
 export default {
   name: 'App',
-  components: {IndexHeader}
+  components: {IndexHeader, FooterPage}
 }
 </script>
 

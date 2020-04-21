@@ -23,9 +23,6 @@
             </div>
         </div>
     </div>
-    <el-footer>
-        <div class="bg">©版权所有 登录必究</div>
-    </el-footer>
   </el-container>
 </template>
 
@@ -111,9 +108,5 @@ export default {
 
 .btn2 {
     width: 70%;
-}
-
-.bg {
-    background-color: #FFF;
 }
 </style>
