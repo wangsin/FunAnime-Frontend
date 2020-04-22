@@ -103,7 +103,7 @@ export default {
 }
 
 .btn1 {
-    width: 30%;
+    /*width: 30%;*/
 }
 
 .btn2 {

@@ -7,23 +7,11 @@
             <img src="../assets/material.jpg" alt="material">
           </el-carousel-item>
         </el-carousel>
-        <el-container style="display: flex; flex-direction: column; height: 100%; width: 30%; margin-left: 25px;">
-          <el-row :gutter="20" class="subCard">
-            <el-col :xs="24" :sm="12" :md="12" v-for="i in 4" :key="i">
-              <el-card :body-style="{ padding: '0px' }" shadow="hover" style="margin-bottom: 30px;">
-                <img src="../assets/material.jpg" class="image">
-                <div style="padding: 14px; display: flex; flex-direction: column;">
-                  <span style="font-size: 15px;text-align: left">【罗翔】7岁？14岁？刑事责任年龄要不要下调？</span>
-                  <time class="time">1998-01-01 01:00</time>
-                </div>
-              </el-card>
-            </el-col>
-          </el-row>
-        </el-container>
       </div>
     </el-container>
     <div class="top">
       <el-row :gutter="20" class="subCard"
+              style="margin-left: 0;margin-right: 0;"
               v-infinite-scroll="load"
               infinite-scroll-disabled="disabled"
               infinite-scroll-distance="10">
@@ -96,7 +84,7 @@ a{
 }
 
 .mainCard {
-  width: 70%;
+  width: 100%;
 }
 
 .card {
