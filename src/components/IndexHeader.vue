@@ -37,6 +37,14 @@ export default {
         {
           title: '科技',
           router: '/tech'
+        },
+        {
+          title: 'test-信息补全',
+          router: '/supple'
+        },
+        {
+          title: 'test-视频详情',
+          router: '/video/10'
         }
       ],
       headListDefault: '/',

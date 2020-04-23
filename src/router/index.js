@@ -29,6 +29,11 @@ export default new Router({
       path: '/supple',
       name: 'SupplePage',
       component: () => import(/* webpackChunkName: "video" */ '@/components/SupplePage')
+    },
+    {
+      path: '/video/:videoID',
+      name: 'VideoPage',
+      component: () => import(/* webpackChunkName: "video" */ '@/components/VideoPage')
     }
   ]
 })

@@ -4,5 +4,8 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="tcplayer.v4" level="application" />
+    <orderEntry type="library" name="hls.0.12.4" level="application" />
+    <orderEntry type="library" name="tcplayer" level="application" />
   </component>
 </module>
