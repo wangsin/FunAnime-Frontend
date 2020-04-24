@@ -1,5 +1,5 @@
 <template>
-  <el-menu :default-active="headListDefault" mode="horizontal" :select="1" :router="routerSwitch" id="nav">
+  <el-menu :default-active="headListDefault" mode="horizontal" :router="routerSwitch" id="nav">
     <el-menu-item><img id="main-logo" src="../assets/funanime-logo.svg" alt="logo" /></el-menu-item>
     <el-menu-item v-for="head in headListData" :index="head.router" :key="head.title">
       {{head.title}}
@@ -51,8 +51,7 @@ export default {
       routerSwitch: true
     }
   },
-  method: {
-  }
+  methods: {}
 }
 </script>
 

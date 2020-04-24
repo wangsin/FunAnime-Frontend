@@ -22,14 +22,73 @@
     <div class="player" id="barrage">
       <video id="player-container-id" preload="auto" playsinline webkit-playsinline controls></video>
     </div>
-    <div style="display: inline-flex; flex-direction: row; margin-top: 5px;">
+    <div class="barrageArea">
       <el-input v-model="barrageText" placeholder="请输入弹幕~"></el-input>
-      <el-button @click="submitBarrage" style="margin-left: 5px;">发射</el-button>
+      <el-color-picker class="barBtn" v-model="barrageColor"></el-color-picker>
+      <el-button @click="submitBarrage" class="barBtn" >发射</el-button>
     </div>
 
-    <div style="height: 200px;">
+    <el-row style="margin-top: 50px;">
+      <el-col :span="18" class="comment">
+        <span class="mainTitle" style="text-align: start; float: left;">评论</span>
+        <span style="text-align: start; float: left; font-size: 10px; margin-bottom: 14px;">楼中楼功能暂不支持 未来版本迭代</span>
+        <el-form style="display: flex; flex-direction: row;margin:14px 0;">
+          <el-input
+            type="textarea"
+            id="inputCommentArea"
+            style="resize: none; margin-right: 10px;"
+            :rows="4"
+            placeholder="请输入评论"
+            v-model="inputComment">
+          </el-input>
+          <el-button icon="el-icon-edit" size="small" @click="noFollowComment"></el-button>
+        </el-form>
+        <div v-for="_ in 14">
+          <div class="commentSingle">
+            <img src="../assets/logo.png" style="height: 40px;margin: 0 10px 0 0;" alt="">
+            <div style="display: flex; flex-direction: column; justify-content: start; width: 100%;">
+              <span style="font-size: 7px;text-align: start;float: start;margin: 2px;"><span style="font-size: 20px;">Fucker</span> 2019/01/01 03:29</span>
+              <span style="text-align: start;float: start;margin: 2px;">这个视频真是太傻掉了</span>
+              <div style="display: flex; flex-direction: row;margin: 7px 0 7px auto; justify-content: end;">
+                <el-button icon="el-icon-edit" size="small" @click="noFollowComment"></el-button>
+                <el-button type="primary" icon="el-icon-star-off" size="small" ></el-button>
+              </div>
+              <el-divider></el-divider>
+            </div>
+          </div>
+        </div>
+        <el-pagination
+          style="width: 100%;"
+          :page-size="14"
+          :pager-count="1"
+          layout="prev, pager, next"
+          :total="1000">
+        </el-pagination>
+      </el-col>
+      <el-col :span="6" class="comment">
+        <div class="subInfo">
+          <el-button-group style="width: 100%;">
+            <el-button type="primary" icon="el-icon-star-off">收藏</el-button>
+            <el-button type="primary" icon="el-icon-share">分享</el-button>
+          </el-button-group>
+        </div>
+        <div class="subInfo">
+          <span class="mainTitle" style="text-align: start; float: left;">视频信息</span>
+          <span class="desc">播放：1w</span>
+          <span class="desc">收藏：1w</span>
+          <span class="desc">评论：1w</span>
+        </div>
+        <div class="subInfo">
+          <span class="mainTitle" style="text-align: start; float: left;">分类</span>
+          <span class="desc">动漫 / 沙雕配音</span>
+        </div>
+        <div class="subInfo">
+          <span class="mainTitle" style="text-align: start; float: left;">相关视频</span>
+          <span class="desc">智能推荐相关待未来版本迭代</span>
+        </div>
+      </el-col>
+    </el-row>
 
-    </div>
   </el-container>
 </template>
 
@@ -109,6 +168,8 @@ export default {
   },
   data () {
     return {
+      barrageColor: '#fff',
+      inputComment: '',
       video: {
         id: 1,
         name: '测试视频标题',
@@ -139,15 +200,12 @@ export default {
   },
   methods: {
     submitBarrage: function () {
-      let currTime = player.currentTime()
-      let nowTime = currTime * 1000
-      console.log(nowTime)
       barrage.add({
         key: uuidv4(),
-        time: nowTime,
+        time: player.currentTime() * 1000,
         text: this.$data.barrageText,
         fontSize: 26,
-        color: '#0ff',
+        color: this.$data.barrageColor,
       })
       this.$data.barrageText = ''
     },
@@ -158,12 +216,20 @@ export default {
     unsubscribe: function () {
       console.log("un:" + this.$data.video.uploader.isFollow)
       this.$data.video.uploader.isFollow = false
+    },
+    noFollowComment: function () {
+      this.$message({
+        showClose: true,
+        message: '评论回复功能暂不支持~',
+        type: 'error'
+      });
     }
   }
 }
 </script>
 
 <style scoped>
+@import "../../node_modules/element-ui/lib/theme-chalk/index.css";
 .head {
   display: flex;
   flex-direction: row;
@@ -227,4 +293,49 @@ export default {
   height: 100%;
   width: 100%;
 }
+
+.barrageArea {
+  display: inline-flex;
+  flex-direction: row;
+  margin-top: 5px;
+}
+
+.barrageArea .barBtn {
+  margin-left: 5px;
+}
+
+.comment {
+  float: left;
+  display: flex;
+  flex-direction: column;
+  padding-right: 90px;
+}
+
+.commentSingle {
+  display: flex;
+  flex-direction: row;
+  margin: 14px 0 0 0;
+}
+
+.subInfo {
+  float: left;
+  display: flex;
+  flex-direction: column;
+  margin: 20px 0;
+}
+
+.subInfo .desc {
+  text-align: start;
+  float: left;
+  font-size: 17px;
+}
+
+#inputCommentArea {
+  resize: none !important;
+}
+
+.el-textarea .el-textarea__inner{
+   resize: none !important;
+}
+
 </style>
