@@ -14,15 +14,15 @@
           <el-button slot="append" v-if="verify.allowSend" @click="sendSms()" icon="el-icon-refresh-right">获取验证码</el-button>
           <el-button slot="append" v-else icon="el-icon-refresh-right" disabled> {{verify.authTime}} 秒后重新发送</el-button>
         </el-input>
-        <el-input v-model="password" v-if="quickRegister" placeholder="密码" class="inputArea"></el-input>
-        <el-input v-model="passwordRepeat" v-if="quickRegister" placeholder="重复密码" class="inputArea"></el-input>
+        <el-input v-model="password" v-if="quickRegister" placeholder="密码" class="inputArea" show-password></el-input>
+        <el-input v-model="passwordRepeat" v-if="quickRegister" placeholder="重复密码" class="inputArea" show-password></el-input>
         <el-input v-model="mail" v-if="quickRegister" placeholder="邮箱" class="inputArea"></el-input>
         <el-checkbox v-model="checked" class="checkArea">我同意<a href="">《用户协议》</a></el-checkbox>
         <div class="btn">
           <el-button type="primary" class="btn1" icon="el-icon-question" plain></el-button>
           <el-button type="primary" class="btn2" v-if="quickRegister" @click="switchMethod" plain>切换到快速注册</el-button>
           <el-button type="primary" class="btn2" v-if="normalRegister" @click="switchMethod" plain>切换到普通注册</el-button>
-          <el-button type="primary" class="btn3" :disabled="!checked">注册</el-button>
+          <el-button type="primary" class="btn3" @click="submit()" :disabled="!checked">注册</el-button>
         </div>
       </div>
     </div>
@@ -31,6 +31,7 @@
 
 <script>
 import * as API from '@/api/user/'
+import {encrypt} from '../util/encrypt.js'
 
 export default {
   name: 'RegisterPage',
@@ -48,7 +49,8 @@ export default {
       quickRegister: false,
       normalRegister: true,
       checked: false,
-      disabled: false
+      disabled: false,
+      routerPushTime: 0
     }
   },
   methods: {
@@ -58,6 +60,13 @@ export default {
       this.normalRegister = !this.normalRegister
     },
     sendSms: function () {
+      if (this.$data.phone === '') {
+        this.$notify.error({
+          title: '发送失败',
+          message: '请输入手机号~'
+        })
+      }
+
       API.sendSms({
         phone: this.$data.phone,
         type: 1
@@ -82,9 +91,59 @@ export default {
           }, 1000)
         }
       }).catch((error) => {
+        console.log(error)
         this.$notify.error({
           title: '发送失败',
-          message: error
+          message: '服务器开小差了，请稍后再试~'
+        })
+      })
+    },
+    submit: function () {
+      if (this.$data.phone === '' || this.$data.verifyCode === '') {
+        this.$notify.error({
+          title: '注册失败',
+          message: '请正确输入信息'
+        })
+        return
+      }
+
+      if (this.$data.password !== this.$data.passwordRepeat) {
+        this.$notify.error({
+          title: '注册失败',
+          message: '两次输入的密码不一致，请重新输入~'
+        })
+        return
+      }
+
+      API.submitRegister({
+        phone: this.$data.phone,
+        smsCode: this.$data.verifyCode,
+        password: encrypt(this.$data.password),
+        mail: this.$data.mail
+      }).then((res) => {
+        if (res.errno !== 0) {
+          // 业务逻辑失败
+          this.$notify.error({
+            title: '提交失败',
+            message: res.errmsg
+          })
+        } else {
+          // 注册成功 路由跳转到登录页面
+          this.$notify.info({
+            title: '注册成功',
+            message: '3秒后将跳转到登陆页面'
+          })
+
+          let pushTimer = setTimeout(() => {
+            clearTimeout(pushTimer)
+            this.$router.push('/login')
+          }, 3000)
+        }
+      }).catch((error) => {
+        console.log(error)
+        this.$notify.error({
+          title: '提交失败',
+          message: '服务器开小差了，请稍后再试~'
         })
       })
     }
