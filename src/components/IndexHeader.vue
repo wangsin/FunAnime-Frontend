@@ -45,6 +45,10 @@ export default {
         {
           title: 'test-视频详情',
           router: '/video/10'
+        },
+        {
+          title: 'test-视频上传',
+          router: '/post'
         }
       ],
       headListDefault: '/',

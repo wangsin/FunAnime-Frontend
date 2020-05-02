@@ -34,6 +34,11 @@ export default new Router({
       path: '/video/:videoID',
       name: 'VideoPage',
       component: () => import(/* webpackChunkName: "video" */ '@/components/VideoPage')
+    },
+    {
+      path: '/post',
+      name: 'PostPage',
+      component: () => import(/* webpackChunkName: "video" */ '@/components/PostPage')
     }
   ]
 })

@@ -11,7 +11,8 @@
           <template slot="prepend">+86</template>
         </el-input>
         <el-input v-model="verifyCode" placeholder="验证码" class="inputArea">
-          <el-button slot="append" icon="el-icon-refresh-right">获取验证码</el-button>
+          <el-button slot="append" v-if="verify.allowSend" @click="sendSms()" icon="el-icon-refresh-right">获取验证码</el-button>
+          <el-button slot="append" v-else icon="el-icon-refresh-right" disabled> {{verify.authTime}} 秒后重新发送</el-button>
         </el-input>
         <el-input v-model="password" v-if="quickRegister" placeholder="密码" class="inputArea"></el-input>
         <el-input v-model="passwordRepeat" v-if="quickRegister" placeholder="重复密码" class="inputArea"></el-input>
@@ -29,10 +30,16 @@
 </template>
 
 <script>
+import * as API from '@/api/user/'
+
 export default {
   name: 'RegisterPage',
   data () {
     return {
+      verify: {
+        allowSend: true,
+        authTime: 0
+      },
       phone: '',
       verifyCode: '',
       password: '',
@@ -49,6 +56,37 @@ export default {
       console.log(this.checked)
       this.quickRegister = !this.quickRegister
       this.normalRegister = !this.normalRegister
+    },
+    sendSms: function () {
+      API.sendSms({
+        phone: this.$data.phone,
+        type: 1
+      }).then((res) => {
+        if (res.errno !== 0) {
+          // 业务逻辑失败
+          this.$notify.error({
+            title: '发送失败',
+            message: res.errmsg
+          })
+        } else {
+          // 发送成功
+          this.$data.verify.authTime = 30
+          this.$data.verify.allowSend = false
+
+          let authTimer = setInterval(() => {
+            this.$data.verify.authTime--
+            if (this.$data.verify.authTime <= 0) {
+              this.$data.verify.allowSend = true
+              clearInterval(authTimer)
+            }
+          }, 1000)
+        }
+      }).catch((error) => {
+        this.$notify.error({
+          title: '发送失败',
+          message: error
+        })
+      })
     }
   }
 }
