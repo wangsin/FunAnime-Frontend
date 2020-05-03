@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <el-header>
+    <el-header v-if="controlHeader()">
       <index-header></index-header>
     </el-header>
     <router-view></router-view>
@@ -13,7 +13,13 @@ import IndexHeader from './components/IndexHeader'
 import FooterPage from './components/FooterPage'
 export default {
   name: 'App',
-  components: {IndexHeader, FooterPage}
+  components: {IndexHeader, FooterPage},
+  methods: {
+    controlHeader: function () {
+      console.log(this.$router.path)
+      return this.$router.history.current.fullPath !== '/login'
+    }
+  }
 }
 </script>
 

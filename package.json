@@ -19,7 +19,8 @@
     "element-ui": "^2.13.0",
     "uuid": "^7.0.3",
     "vue": "^2.5.2",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "vuex": "^3.3.0"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

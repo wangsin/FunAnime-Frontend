@@ -65,6 +65,7 @@ export default {
           title: '发送失败',
           message: '请输入手机号~'
         })
+        return
       }
 
       API.sendSms({

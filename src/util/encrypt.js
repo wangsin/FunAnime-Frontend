@@ -6,11 +6,9 @@ export const encrypt = function (word) {
     return ''
   }
 
-  let key = CryptoJS.enc.Utf8.parse('123456')
-  let srcs = CryptoJS.enc.Utf8.parse(word)
-  let encrypted = CryptoJS.AES.encrypt(srcs, key, {
+  let encrypt = CryptoJS.AES.encrypt(word, CryptoJS.enc.Utf8.parse('12345678'), {
     mode: CryptoJS.mode.ECB,
     padding: CryptoJS.pad.Pkcs7
   })
-  return encrypted.toString()
+  return encrypt.toString()
 }

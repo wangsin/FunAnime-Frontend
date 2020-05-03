@@ -28,7 +28,10 @@ export default new Router({
     {
       path: '/supple',
       name: 'SupplePage',
-      component: () => import(/* webpackChunkName: "video" */ '@/components/SupplePage')
+      component: () => import(/* webpackChunkName: "video" */ '@/components/SupplePage'),
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/video/:videoID',
@@ -38,7 +41,10 @@ export default new Router({
     {
       path: '/post',
       name: 'PostPage',
-      component: () => import(/* webpackChunkName: "video" */ '@/components/PostPage')
+      component: () => import(/* webpackChunkName: "video" */ '@/components/PostPage'),
+      meta: {
+        requiresAuth: true
+      }
     }
   ]
 })
