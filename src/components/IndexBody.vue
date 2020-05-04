@@ -2,9 +2,9 @@
   <div>
     <el-container class="indexRoot">
       <div class="card">
-        <el-carousel class="mainCard" trigger="click" height="455px" indicator-position="outside">
-          <el-carousel-item v-for="item in 4" :key="item">
-            <img src="../assets/material.jpg" alt="material">
+        <el-carousel class="mainCard" trigger="click" height="580px" indicator-position="outside">
+          <el-carousel-item v-for="(item, k) in carouselList" :key="k">
+            <img :src="item.true_img" @click="toVideo(item.video_id)" alt="material">
           </el-carousel-item>
         </el-carousel>
       </div>
@@ -32,10 +32,40 @@
 </template>
 
 <script>
+import * as configApi from '../api/config'
+
 export default {
   name: 'IndexBody',
+  beforeMount: function () {
+    configApi.getBasicConfig().then((resp) => {
+      if (resp.errno !== 0) {
+        console.log('fuck_server')
+        this.$data.carouseList = [{
+          true_img: 'http://192.168.127.130:4869/f5bcefc53fd9ca8df8c7f583effa50fa',
+          video_id: 11
+        }]
+        return
+      }
+      this.$data.carouseList = resp.data.carousel_img
+    }).catch((err) => {
+      console.log('fuck_server_twice')
+      console.log(err)
+    })
+  },
   data () {
     return {
+      carouselList: [{
+        true_img: 'http://192.168.127.130:4869/f5bcefc53fd9ca8df8c7f583effa50fa',
+        video_id: 11
+      },
+      {
+        true_img: 'http://192.168.127.130:4869/36efcb7af804a59267bdd14fe7409862',
+        video_id: 12
+      },
+      {
+        true_img: 'http://192.168.127.130:4869/5d88693b5749a36a6750f50d4ad90ee8',
+        video_id: 13
+      }],
       currentDate: new Date(),
       count: 12,
       videos: [],
@@ -57,6 +87,9 @@ export default {
         this.count += 4
         this.loading = false
       }, 2000)
+    },
+    toVideo (id) {
+      this.$router.push('/video/' + id)
     }
   }
 }
@@ -90,7 +123,7 @@ a{
 .card {
   display: flex;
   flex-flow: row nowrap;
-  margin: 40px 100px 0 100px;
+  margin: 40px 0 0 0;
   width: 100%;
 }
 

@@ -61,7 +61,7 @@ export default {
         } else {
           this.$store.commit('set_user_obj', resp.data)
           this.$notify.info({
-            title: '欢迎回来' + resp.data.nick_name,
+            title: '欢迎回来 ' + resp.data.nick_name,
             message: '3s后为您跳转到主页'
           })
           let loginTimeOut = setTimeout(() => {

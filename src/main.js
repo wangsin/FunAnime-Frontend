@@ -4,11 +4,13 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import ElementUI from 'element-ui'
+import VueCookie from 'vue-cookie'
 import store from './store/store.js'
 import 'element-ui/lib/theme-chalk/index.css'
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)
+Vue.use(VueCookie)
 
 router.beforeEach((to, form, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
