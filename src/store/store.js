@@ -37,8 +37,8 @@ const mutations = {
     window.sessionStorage.setItem(userInfo, JSON.stringify(user))
   },
   set_offline: (state) => {
-    state.outerToken = ''
-    state.userInfo = '%7b%7b'
+    state.outerToken = '{}'
+    state.userInfo = '{}'
 
     window.sessionStorage.removeItem(outerToken)
     window.sessionStorage.removeItem(userInfo)
@@ -50,7 +50,7 @@ const mutations = {
 
 const getters = {
   isLogin: (state) => {
-    return !!state.outerToken
+    return state.outerToken !== '{}'
   }
 }
 

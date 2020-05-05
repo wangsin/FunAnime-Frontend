@@ -6,15 +6,15 @@
         <span class="mainTime">创建时间：{{video.date}}</span>
       </div>
       <div class="uploader">
-        <img v-if="video.uploader.avatar" :src="video.uploader.avatar" alt=""/>
+        <img v-if="video.uploader.avatar" :src="video.uploader.avatar" style="height: 70px; margin-right: 20px;" alt=""/>
         <img v-else src="../assets/logo.png" alt="" style="height: 70px; margin-right: 20px;">
         <div class="textArea">
           <span class="nickname">{{video.uploader.nickname}}</span>
-          <div style="display: flex; align-self: flex-end; margin-top: 10px;">
-            <span class="mainTime">粉丝数：{{video.uploader.followers}}</span>
-            <el-button @click="unsubscribe" v-if="video.uploader.isFollow" class="btn" type="info" round>取消关注</el-button>
-            <el-button @click="subscribe" v-else class="btn" type="primary" round>+ 关注</el-button>
-          </div>
+<!--          <div style="display: flex; align-self: flex-end; margin-top: 10px;">-->
+<!--            <span class="mainTime">粉丝数：{{video.uploader.followers}}</span>-->
+<!--            <el-button @click="unsubscribe" v-if="video.uploader.isFollow" class="btn" type="info" round>取消关注</el-button>-->
+<!--            <el-button @click="subscribe" v-else class="btn" type="primary" round>+ 关注</el-button>-->
+<!--          </div>-->
         </div>
       </div>
     </div>
@@ -43,7 +43,7 @@
           </el-input>
           <el-button icon="el-icon-edit" size="small" @click="noFollowComment"></el-button>
         </el-form>
-        <div v-for="_ in 14">
+        <div v-for="_ in 8">
           <div class="commentSingle">
             <img src="../assets/logo.png" style="height: 40px;margin: 0 10px 0 0;" alt="">
             <div style="display: flex; flex-direction: column; justify-content: start; width: 100%;">
@@ -57,30 +57,31 @@
             </div>
           </div>
         </div>
-        <el-pagination
-          style="width: 100%;"
-          :page-size="14"
-          :pager-count="1"
-          layout="prev, pager, next"
-          :total="1000">
-        </el-pagination>
+<!--        <el-pagination-->
+<!--          style="width: 100%;"-->
+<!--          :page-size="14"-->
+<!--          :pager-count="1"-->
+<!--          layout="prev, pager, next"-->
+<!--          :total="1000">-->
+<!--        </el-pagination>-->
       </el-col>
       <el-col :span="6" class="comment">
         <div class="subInfo">
           <el-button-group style="width: 100%;">
-            <el-button type="primary" icon="el-icon-star-off">收藏</el-button>
+            <el-button v-if="this.video.isCollect" type="primary" icon="el-icon-star-on" plain>取消收藏</el-button>
+            <el-button v-else type="primary" icon="el-icon-star-off">收藏</el-button>
             <el-button type="primary" icon="el-icon-share">分享</el-button>
           </el-button-group>
         </div>
         <div class="subInfo">
           <span class="mainTitle" style="text-align: start; float: left;">视频信息</span>
-          <span class="desc">播放：1w</span>
+          <span class="desc">播放：{{this.video.pv}}</span>
           <span class="desc">收藏：1w</span>
           <span class="desc">评论：1w</span>
         </div>
         <div class="subInfo">
           <span class="mainTitle" style="text-align: start; float: left;">分类</span>
-          <span class="desc">动漫 / 沙雕配音</span>
+          <span class="desc">{{this.video.category}}</span>
         </div>
         <div class="subInfo">
           <span class="mainTitle" style="text-align: start; float: left;">相关视频</span>
@@ -96,71 +97,109 @@
 import Barrage from 'barrage-ui';
 import example from 'barrage-ui/example.json'; // 组件提供的示例数据
 import { v4 as uuidv4 } from 'uuid';
+import * as configApi from '../api/config/index.js'
 
 let player = {}
 let barrage = {}
 export default {
   name: 'VideoPage',
   mounted() {
-    player = TCPlayer('player-container-id', { // player-container-id 为播放器容器 ID，必须与 html 中一致
-      fileID: '5285890801762352687', // 请传入需要播放的视频 filID（必须）
-      appID: '1252888782' // 请传入点播账号的 appID（必须）
-    })
+    console.log(this.$route.params)
+    configApi.getVideoDetail({
+      id: this.$route.params.videoID
+    }).then((resp) => {
+      if (resp.errno !== 0) {
+        if (resp.errno === -2000003) {
+          this.$router.push('/notFound')
+          return
+        }
 
-    barrage = new Barrage({
-      container: document.getElementById('player-container-id'), // 父级容器
-      data: example, // 弹幕数据
-      config: {
-        // 全局配置项
-        duration: -1, // 弹幕循环周期(单位：毫秒)
-        defaultColor: '#fff', // 弹幕默认颜色
-      },
-    });
+        this.$notify.error({
+          title: '请求失败',
+          message: resp.errmsg
+        })
+        return
+      }
 
-    let viCanvas = document.getElementById('player-container-id')
+      this.video.id = this.$route.params.videoID
+      this.video.name = resp.data.video_name
+      this.video.fileId = resp.data.video_remote_id
+      this.video.date = resp.data.create_time
+      this.video.isCollect = resp.data.is_collect
+      this.video.pv = resp.data.pv
+      this.video.category = resp.data.category
+      this.video.uploader = {
+        avatar: resp.data.creator_img,
+        nickname: resp.data.creator
+      }
 
-    window.onresize = (function () {
-      barrage.canvas.height = viCanvas.offsetHeight;
-      barrage.canvas.width = viCanvas.offsetWidth;
-    })
+      player = TCPlayer('player-container-id', { // player-container-id 为播放器容器 ID，必须与 html 中一致
+        fileID: resp.data.video_remote_id, // 请传入需要播放的视频 filID（必须）
+        appID: '1252888782', // 请传入点播账号的 appID（必须）
+        QualitySwitcherMenuButton: true
+      })
 
-    player.on('playing', function () {
-      barrage.play()
-    })
+      barrage = new Barrage({
+        container: document.getElementById('player-container-id'), // 父级容器
+        data: example, // 弹幕数据
+        config: {
+          // 全局配置项
+          duration: -1, // 弹幕循环周期(单位：毫秒)
+          defaultColor: '#fff', // 弹幕默认颜色
+        },
+      });
 
-    player.on('pause', function () {
-      barrage.pause()
-    })
+      let viCanvas = document.getElementById('player-container-id')
 
-    player.on('fullscreenchange', function () {
-      if (player.isFullscreen()) {
-        barrage.canvas.height = screen.height;
-        barrage.canvas.width = screen.width;
-      } else {
+      window.onresize = (function () {
         barrage.canvas.height = viCanvas.offsetHeight;
         barrage.canvas.width = viCanvas.offsetWidth;
-      }
-    })
-
-    player.on('seeking', function () {
-      barrage.pause()
-    })
-
-    player.on('seeked', function () {
-      barrage.goto(player.currentTime() * 1000)
-    })
-
-    player.on('loadstart', function () {
-      barrage.pause()
-    })
-
-    player.on('ratechange', function () {
-      console.log('rate change')
-      // barrage.goto(player.currentTime() * 1000)
-      barrage.setConfig({
-        speed: 100 * viCanvas.playbackRate
       })
-      console.log(player.currentTime() * 1000)
+
+      player.on('playing', function () {
+        barrage.play()
+      })
+
+      player.on('pause', function () {
+        barrage.pause()
+      })
+
+      player.on('fullscreenchange', function () {
+        if (player.isFullscreen()) {
+          barrage.canvas.height = screen.height;
+          barrage.canvas.width = screen.width;
+        } else {
+          barrage.canvas.height = viCanvas.offsetHeight;
+          barrage.canvas.width = viCanvas.offsetWidth;
+        }
+      })
+
+      player.on('seeking', function () {
+        barrage.pause()
+      })
+
+      player.on('seeked', function () {
+        barrage.goto(player.currentTime() * 1000)
+      })
+
+      player.on('loadstart', function () {
+        barrage.pause()
+      })
+
+      player.on('ratechange', function () {
+        console.log('rate change')
+        // barrage.goto(player.currentTime() * 1000)
+        barrage.setConfig({
+          speed: 100 * viCanvas.playbackRate
+        })
+        console.log(player.currentTime() * 1000)
+      })
+    }).catch((err) => {
+      console.log(err)
+      this.$notify.error({
+        title: '请求失败',
+        message: err
+      })
     })
   },
   beforeDestroy() {
@@ -172,16 +211,16 @@ export default {
       inputComment: '',
       video: {
         id: 1,
-        name: '测试视频标题',
-        fileId: '5285890801762352687',
-        appId: '1252888782',
+        isCollect: false,
+        pv: '',
+        category: '',
+        name: '加载中...',
+        fileId: '',
+        appId: '',
         date: new Date().toLocaleString(),
         uploader: {
           avatar: '',
-          nickname: 'fuckerfucker',
-          followers: 100,
-          isFollow: false,
-          level: 1
+          nickname: '加载中...',
         },
         describe: '',
         tag: ['']
@@ -252,7 +291,7 @@ export default {
 .mainTime {
   font-size: 16px;
   font-weight: normal;
-  align-self: center;
+  /*align-self: center;*/
 }
 
 .uploader {

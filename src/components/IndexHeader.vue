@@ -4,10 +4,17 @@
     <el-menu-item v-for="head in headListData" :index="head.router" :key="head.title">
       {{head.title}}
     </el-menu-item>
-    <el-menu-item v-if="$store.state.outerToken" class="menu-right">
-      <el-button type="primary" @click="$store.commit('set_offline')" plain>注销</el-button>
-      <el-button type="primary" @click="$store.commit('set_offline')" plain>Ping</el-button>
-      <span style="margin-left: 10px;">{{ JSON.parse($store.state.userInfo).nick_name }}</span>
+    <el-menu-item v-if="$store.getters.isLogin" class="menu-right">
+      <el-dropdown @command="toLink">
+        <span class="el-dropdown-link">{{ JSON.parse($store.state.userInfo).nick_name }}</span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item>个人中心</el-dropdown-item>
+          <el-dropdown-item :command="() => {$router.push('/post')}">创作视频</el-dropdown-item>
+          <el-dropdown-item>我的收藏</el-dropdown-item>
+          <el-dropdown-item :command="() => {$router.push('/supple')}">信息完善</el-dropdown-item>
+          <el-dropdown-item :command="() => {$store.commit('set_offline')}" divided>注销</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
     </el-menu-item>
     <el-menu-item v-else class="menu-right">
       <el-button type="primary" @click="$router.push('/register')" plain>注册</el-button>
@@ -60,6 +67,9 @@ export default {
         path: '/login'
       })
       window.open(newPage.href, '_blank')
+    },
+    toLink: function (command) {
+      command()
     }
   }
 }
@@ -83,5 +93,13 @@ export default {
   .menu-right {
     float: right !important;
     padding: 0 10px;
+  }
+
+  .el-dropdown-link {
+    cursor: pointer;
+    color: #409EFF;
+  }
+  .el-icon-arrow-down {
+    font-size: 12px;
   }
 </style>

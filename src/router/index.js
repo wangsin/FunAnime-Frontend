@@ -11,9 +11,9 @@ export default new Router({
       component: () => import(/* webpackChunkName: "video" */ '@/components/IndexBody')
     },
     {
-      path: '/anime',
+      path: '/list/:type',
       name: 'AnimePage',
-      component: () => import(/* webpackChunkName: "video" */ '@/components/AnimePage')
+      component: () => import(/* webpackChunkName: "video" */ '@/components/VListPage')
     },
     {
       path: '/login',
@@ -36,7 +36,7 @@ export default new Router({
     {
       path: '/video/:videoID',
       name: 'VideoPage',
-      component: () => import(/* webpackChunkName: "video" */ '@/components/VideoPage')
+      component: (videoID) => import(/* webpackChunkName: "video" */ '@/components/VideoPage')
     },
     {
       path: '/post',
@@ -45,6 +45,11 @@ export default new Router({
       meta: {
         requiresAuth: true
       }
+    },
+    {
+      path: '/notFound',
+      name: 'NotFound',
+      component: () => import('@/components/NotFountComponent')
     }
   ]
 })

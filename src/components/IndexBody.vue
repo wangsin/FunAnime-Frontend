@@ -2,8 +2,8 @@
   <div>
     <el-container class="indexRoot">
       <div class="card">
-        <el-carousel class="mainCard" trigger="click" height="580px" indicator-position="outside">
-          <el-carousel-item v-for="(item, k) in carouselList" :key="k">
+        <el-carousel class="mainCard" trigger="click" height="620px" indicator-position="outside">
+          <el-carousel-item v-for="(item, k) in carouseList" :key="k">
             <img :src="item.true_img" @click="toVideo(item.video_id)" alt="material">
           </el-carousel-item>
         </el-carousel>
@@ -15,17 +15,17 @@
               v-infinite-scroll="load"
               infinite-scroll-disabled="disabled"
               infinite-scroll-distance="10">
-        <el-col :xs="24" :sm="6" :md="6" v-for="i in count" :key="i">
-          <el-card :body-style="{ padding: '0px' }" shadow="hover" style="margin-bottom: 20px;">
-            <img src="../assets/material.jpg" class="image">
-            <div style="padding: 14px; display: flex; flex-direction: column;">
-              <span style="font-size: 15px;text-align: left">【罗翔】7岁？14岁？刑事责任年龄要不要下调？</span>
-              <time class="time">1998-01-01 01:00</time>
+        <el-col :xs="24" :sm="6" :md="6" v-for="(video, i) in videoList" :key="i">
+          <el-card :body-style="{ padding: '0px' }" shadow="hover" style="margin-bottom: 20px;cursor: pointer;">
+            <img @click="toVideo(video.video_id)" :src="video.true_img" class="image">
+            <div @click="toVideo(video.video_id)" style="padding: 14px; display: flex; flex-direction: column;">
+              <span style="font-size: 15px;text-align: left">{{video.title}}</span>
+              <time class="time">播放量：{{video.volume}} 投稿时间：{{video.date}}</time>
             </div>
           </el-card>
         </el-col>
       </el-row>
-      <p v-if="loading">加载中...</p>
+      <p v-if="loading" v-loading="loading"></p>
       <p v-if="noMore">没有更多了</p>
     </div>
   </div>
@@ -39,42 +39,52 @@ export default {
   beforeMount: function () {
     configApi.getBasicConfig().then((resp) => {
       if (resp.errno !== 0) {
-        console.log('fuck_server')
-        this.$data.carouseList = [{
-          true_img: 'http://192.168.127.130:4869/f5bcefc53fd9ca8df8c7f583effa50fa',
-          video_id: 11
-        }]
+        this.$data.carouseList = []
         return
       }
       this.$data.carouseList = resp.data.carousel_img
     }).catch((err) => {
-      console.log('fuck_server_twice')
       console.log(err)
+    })
+
+    configApi.getVideoList({
+      params: {
+        page: this.$data.page,
+        size: this.$data.size,
+        category: 0
+      }
+    }).then((resp) => {
+      if (resp.errno !== 0) {
+        this.$notify.error({
+          title: '请求失败',
+          message: resp.errmsg
+        })
+        return
+      }
+      this.$data.videoList = resp.data.video_list
+      this.$data.count = resp.data.page_data.count
+    }).catch((err) => {
+      this.$notify.error({
+        title: '请求失败',
+        message: err
+      })
     })
   },
   data () {
     return {
-      carouselList: [{
-        true_img: 'http://192.168.127.130:4869/f5bcefc53fd9ca8df8c7f583effa50fa',
-        video_id: 11
-      },
-      {
-        true_img: 'http://192.168.127.130:4869/36efcb7af804a59267bdd14fe7409862',
-        video_id: 12
-      },
-      {
-        true_img: 'http://192.168.127.130:4869/5d88693b5749a36a6750f50d4ad90ee8',
-        video_id: 13
-      }],
+      carouseList: [],
+      videoList: [],
       currentDate: new Date(),
-      count: 12,
+      page: 1,
+      size: 8,
+      count: 0,
       videos: [],
       loading: false
     }
   },
   computed: {
     noMore () {
-      return this.count >= 40
+      return this.videoList.length >= this.count
     },
     disabled () {
       return this.loading || this.noMore
@@ -84,12 +94,41 @@ export default {
     load () {
       this.loading = true
       setTimeout(() => {
-        this.count += 4
-        this.loading = false
-      }, 2000)
+        configApi.getVideoList({
+          params: {
+            page: this.$data.page + 1,
+            size: this.$data.size,
+            category: 0
+          }
+        }).then((resp) => {
+          if (resp.errno !== 0) {
+            console.log('fuck_server')
+            this.$notify.error({
+              title: '请求失败',
+              message: resp.errmsg
+            })
+            return
+          }
+          resp.data.video_list.forEach((data) => {
+            this.$data.videoList.push(data)
+          })
+          this.$data.loading = false
+          this.$data.page++
+          this.$data.count = resp.data.page_data.count
+        }).catch((err) => {
+          console.log('fuck_server_twice')
+          this.$notify.error({
+            title: '请求失败',
+            message: err
+          })
+        })
+      }, 1500)
     },
     toVideo (id) {
-      this.$router.push('/video/' + id)
+      let newPage = this.$router.resolve({
+        path: '/video/' + id
+      })
+      window.open(newPage.href, '_blank')
     }
   }
 }
@@ -118,12 +157,12 @@ a{
 
 .mainCard {
   width: 100%;
+  cursor: pointer;
 }
 
 .card {
   display: flex;
   flex-flow: row nowrap;
-  margin: 40px 0 0 0;
   width: 100%;
 }
 
@@ -138,10 +177,11 @@ a{
   text-align: right;
   color: #999;
   justify-items: left;
+  margin-top: 12px;
 }
 
 .image {
-  width: 100%;
+  height: 250px;
   display: block;
 }
 
