@@ -29,7 +29,11 @@
     </div>
 
     <el-row style="margin-top: 50px;">
-      <el-col :span="18" class="comment">
+      <el-col :span="18" class="comment subInfo">
+        <span class="mainTitle" style="text-align: start; float: left;">视频描述</span>
+        <span class="desc">{{this.video.describe}}</span>
+      </el-col>
+      <el-col style="display: none;" :span="18" class="comment">
         <span class="mainTitle" style="text-align: start; float: left;">评论</span>
         <span style="text-align: start; float: left; font-size: 10px; margin-bottom: 14px;">楼中楼功能暂不支持 未来版本迭代</span>
         <el-form style="display: flex; flex-direction: row;margin:14px 0;">
@@ -77,16 +81,16 @@
           <span class="mainTitle" style="text-align: start; float: left;">视频信息</span>
           <span class="desc">播放：{{this.video.pv}}</span>
           <span class="desc">收藏：1w</span>
-          <span class="desc">评论：1w</span>
+<!--          <span class="desc">评论：1w</span>-->
         </div>
         <div class="subInfo">
           <span class="mainTitle" style="text-align: start; float: left;">分类</span>
           <span class="desc">{{this.video.category}}</span>
         </div>
-        <div class="subInfo">
-          <span class="mainTitle" style="text-align: start; float: left;">相关视频</span>
-          <span class="desc">智能推荐相关待未来版本迭代</span>
-        </div>
+<!--        <div class="subInfo">-->
+<!--          <span class="mainTitle" style="text-align: start; float: left;">相关视频</span>-->
+<!--          <span class="desc">智能推荐相关待未来版本迭代</span>-->
+<!--        </div>-->
       </el-col>
     </el-row>
 
@@ -101,6 +105,7 @@ import * as configApi from '../api/config/index.js'
 
 let player = {}
 let barrage = {}
+let conn = {}
 export default {
   name: 'VideoPage',
   mounted() {
@@ -121,8 +126,10 @@ export default {
         return
       }
 
-      this.video.id = this.$route.params.videoID
+      this.video.videoId = this.$route.params.videoID
+      this.barrageList = resp.data.barrage_list
       this.video.name = resp.data.video_name
+      this.video.describe = resp.data.video_desc
       this.video.fileId = resp.data.video_remote_id
       this.video.date = resp.data.create_time
       this.video.isCollect = resp.data.is_collect
@@ -141,7 +148,7 @@ export default {
 
       barrage = new Barrage({
         container: document.getElementById('player-container-id'), // 父级容器
-        data: example, // 弹幕数据
+        data: this.$data.barrageList, // 弹幕数据
         config: {
           // 全局配置项
           duration: -1, // 弹幕循环周期(单位：毫秒)
@@ -194,6 +201,22 @@ export default {
         })
         console.log(player.currentTime() * 1000)
       })
+
+      // websocket相关
+      if (window["WebSocket"]) {
+        conn = new WebSocket("ws://127.0.0.1:8090/ws")
+        this.supportBarrage = true
+        conn.onclose = function (evt) {
+          console.log('webSocket closed')
+        }
+        conn.onmessage = function (evt) {
+          console.log(evt.data)
+          barrage.add(JSON.parse(evt.data))
+        }
+      } else {
+        this.supportBarrage = false
+      }
+
     }).catch((err) => {
       console.log(err)
       this.$notify.error({
@@ -209,8 +232,10 @@ export default {
     return {
       barrageColor: '#fff',
       inputComment: '',
+      supportBarrage: true,
+      barrageList: [],
       video: {
-        id: 1,
+        videoId: 1,
         isCollect: false,
         pv: '',
         category: '',
@@ -239,13 +264,24 @@ export default {
   },
   methods: {
     submitBarrage: function () {
-      barrage.add({
+      if (!conn) {
+        this.$notify.error({
+          title: '请求失败',
+          message: '与弹幕服务器失去连接',
+        })
+        return
+      }
+
+      conn.send(JSON.stringify({
         key: uuidv4(),
         time: player.currentTime() * 1000,
         text: this.$data.barrageText,
         fontSize: 26,
         color: this.$data.barrageColor,
-      })
+        videoId: this.$data.video.videoId,
+        creatorId: JSON.parse(this.$store.state.userInfo).user_id
+      }))
+
       this.$data.barrageText = ''
     },
     subscribe: function () {

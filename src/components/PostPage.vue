@@ -29,30 +29,26 @@
           <el-form-item v-if="checkStep(1)" label="视频描述">
             <el-input type="textarea" autosize v-model="form.desc"></el-input>
           </el-form-item>
+          <div style="display: none;">
+            <input type="file" style="display:none;" ref="videoFile" @change="setVideoName"/>
+            <input type="file" style="display:none;" ref="videoCover" @change="setCover"/>
+          </div>
           <el-form-item v-if="checkStep(2)" label="视频">
-            <el-upload
-              style="display: block;"
-              class="upload-demo"
-              drag
-              :limit="1"
-              action="https://jsonplaceholder.typicode.com/posts/"
-              :auto-upload="true">
-              <i class="el-icon-upload"></i>
-              <div class="el-upload__text" style="display: block;">将文件拖到此处，或<em>点击上传</em></div>
-            </el-upload>
+            <div style="margin-left: 20px;">
+              <el-button icon="el-icon-upload2" class="submitButton" @click="selectVideo">
+                <span style="font-size: 20px;">点击选择视频</span>
+                <br>
+              </el-button>
+              <el-button class="submitButton" disabled>{{ this.$data.form.fileName || "请选择mp4,mkv,avi等合适的视频格式~" }}</el-button>
+            </div>
           </el-form-item>
           <el-form-item v-if="checkStep(2)" label="封面">
-            <el-upload
-              style="display: block;"
-              class="upload-demo"
-              drag
-              action="https://jsonplaceholder.typicode.com/posts/"
-              :limit="1"
-              :auto-upload="false">
-              <i class="el-icon-upload"></i>
-              <div class="el-upload__text" style="display: block;">将文件拖到此处，或<em>点击上传</em></div>
-              <div class="el-upload__tip" style="display: block;" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
-            </el-upload>
+            <div style="margin-left: 20px;">
+              <el-button icon="el-icon-upload2"  class="submitButton" @click="selectCover">
+                <span style="font-size: 20px;">点击选择封面</span>
+              </el-button>
+              <el-button class="submitButton" @click="uploadVideo">{{ this.$data.form.coverFileName || "请选择jpg,png等合适的图片格式~" }}</el-button>
+            </div>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" v-if="canLast()" @click="lastStep" plain>上一步</el-button>
@@ -67,13 +63,30 @@
 </template>
 
 <script>
+import * as configApi from '../api/config/index.js'
+import TcVod from 'vod-js-sdk-v6'
+
+function getSignature () {
+  return configApi.getVideoUploadSign().then(function (response) {
+    return response.data.sign
+  })
+}
+
 export default {
+  created () {
+    this.tcVod = new TcVod({
+      getSignature: getSignature
+    })
+  },
   name: 'PostPage',
   data () {
     return {
       step: 1,
+      uploaderInfos: [],
       form: {
         name: '',
+        fileName: '',
+        coverFileName: '',
         region1: '',
         region2: '',
         resource: {
@@ -86,6 +99,71 @@ export default {
     }
   },
   methods: {
+    selectVideo: function () {
+      this.$refs.videoFile.click()
+    },
+    selectCover: function () {
+      this.$refs.videoCover.click()
+    },
+    setVideoName: function () {
+      this.$data.form.fileName = this.$refs.videoFile.files[0].name
+    },
+    setCover: function () {
+      this.$data.form.coverFileName = this.$refs.videoCover.files[0].name
+    },
+    /* eslint-disable */
+    uploadVideo: function () {
+      let mediaFile = this.$refs.videoFile.files[0];
+      let coverFile = this.$refs.videoCover.files[0];
+
+      let uploader = this.tcVod.upload({
+        mediaFile: mediaFile,
+        coverFile: coverFile
+      });
+      uploader.on("media_progress", function(info) {
+        uploaderInfo.progress = info.percent;
+      });
+      uploader.on("media_upload", function(info) {
+        uploaderInfo.isVideoUploadSuccess = true;
+      });
+      uploader.on("cover_progress", function(info) {
+        uploaderInfo.coverProgress = info.percent;
+      });
+      uploader.on("cover_upload", function(info) {
+        uploaderInfo.isCoverUploadSuccess = true;
+      });
+      console.log(uploader, "uploader");
+
+      let uploaderInfo = {
+        videoInfo: uploader.videoInfo,
+        coverInfo: uploader.coverInfo,
+        isVideoUploadSuccess: false,
+        isVideoUploadCancel: false,
+        isCoverUploadSuccess: false,
+        progress: 0,
+        coverProgress: 0,
+        fileId: "",
+        videoUrl: "",
+        coverUrl: "",
+        cancel: function() {
+          uploaderInfo.isVideoUploadCancel = true;
+          uploader.cancel();
+        }
+      };
+
+      this.uploaderInfos.push(uploaderInfo);
+
+      uploader
+        .done()
+        .then(function(doneResult) {
+          console.log("doneResult", doneResult);
+
+          uploaderInfo.fileId = doneResult.fileId;
+
+          uploaderInfo.coverUrl = doneResult.cover.url;
+          console.log()
+        }).catch()
+    },
     canLast: function () {
       return this.$data.step !== 1
     },
@@ -141,5 +219,11 @@ export default {
 .el-form-item div {
   display: flex;
   margin: 0 0 10px 0;
+}
+
+.submitButton {
+  width: 360px;
+  height: 180px;
+  margin: 0 10px;
 }
 </style>
