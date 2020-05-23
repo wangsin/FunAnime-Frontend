@@ -11,7 +11,8 @@
             </el-input>
             <el-input v-model="phone" placeholder="手机号" v-if="verifyCodeMethod" class="inputArea"></el-input>
             <el-input v-model="verifyCode" placeholder="验证码" v-if="verifyCodeMethod" class="inputArea" show-password>
-                <el-button slot="append" icon="el-icon-refresh-right">获取验证码</el-button>
+              <el-button slot="append" v-if="verify.allowSend" @click="sendSms()" icon="el-icon-refresh-right">获取验证码</el-button>
+              <el-button slot="append" v-else icon="el-icon-refresh-right" disabled> {{verify.authTime}} 秒后重新发送</el-button>
             </el-input>
             <el-checkbox v-model="checked" class="checkArea">记住我</el-checkbox>
             <div class="btn">
@@ -27,11 +28,16 @@
 <script>
 import * as userApi from '../api/user'
 import {encrypt} from '../util/encrypt'
+import * as API from '@/api/user/'
 
 export default {
   name: 'LoginPage',
   data () {
     return {
+      verify: {
+        allowSend: true,
+        authTime: 0
+      },
       username: '',
       password: '',
       phone: '',
@@ -46,6 +52,46 @@ export default {
     switchMethod: function (event) {
       this.verifyCodeMethod = !this.verifyCodeMethod
       this.passwordMethod = !this.passwordMethod
+    },
+    sendSms: function () {
+      if (this.$data.phone === '') {
+        this.$notify.error({
+          title: '发送失败',
+          message: '请输入手机号~'
+        })
+        return
+      }
+
+      API.sendSms({
+        phone: this.$data.phone,
+        type: 2
+      }).then((res) => {
+        if (res.errno !== 0) {
+          // 业务逻辑失败
+          this.$notify.error({
+            title: '发送失败',
+            message: res.errmsg
+          })
+        } else {
+          // 发送成功
+          this.$data.verify.authTime = 30
+          this.$data.verify.allowSend = false
+
+          let authTimer = setInterval(() => {
+            this.$data.verify.authTime--
+            if (this.$data.verify.authTime <= 0) {
+              this.$data.verify.allowSend = true
+              clearInterval(authTimer)
+            }
+          }, 1000)
+        }
+      }).catch((error) => {
+        console.log(error)
+        this.$notify.error({
+          title: '发送失败',
+          message: '服务器开小差了，请稍后再试~'
+        })
+      })
     },
     login: function () {
       userApi.login({

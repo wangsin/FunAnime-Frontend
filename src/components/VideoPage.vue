@@ -33,7 +33,7 @@
         <span class="mainTitle" style="text-align: start; float: left;">视频描述</span>
         <span class="desc">{{this.video.describe}}</span>
       </el-col>
-      <el-col style="display: none;" :span="18" class="comment">
+      <el-col :span="18" class="comment">
         <span class="mainTitle" style="text-align: start; float: left;">评论</span>
         <span style="text-align: start; float: left; font-size: 10px; margin-bottom: 14px;">楼中楼功能暂不支持 未来版本迭代</span>
         <el-form style="display: flex; flex-direction: row;margin:14px 0;">
@@ -45,14 +45,14 @@
             placeholder="请输入评论"
             v-model="inputComment">
           </el-input>
-          <el-button icon="el-icon-edit" size="small" @click="noFollowComment"></el-button>
+          <el-button icon="el-icon-edit" size="small" @click="submitComment"></el-button>
         </el-form>
-        <div v-for="_ in 8">
+        <div v-for="(c, i) in this.$data.comment">
           <div class="commentSingle">
-            <img src="../assets/logo.png" style="height: 40px;margin: 0 10px 0 0;" alt="">
+            <img :src="c.author.avatar" style="height: 40px;margin: 0 10px 0 0;" alt="">
             <div style="display: flex; flex-direction: column; justify-content: start; width: 100%;">
-              <span style="font-size: 7px;text-align: start;float: start;margin: 2px;"><span style="font-size: 20px;">Fucker</span> 2019/01/01 03:29</span>
-              <span style="text-align: start;float: start;margin: 2px;">这个视频真是太傻掉了</span>
+              <span style="font-size: 7px;text-align: start;float: start;margin: 2px;"><span style="font-size: 20px;">{{c.author.nickname}}</span> {{c.parseTime(c.time)}}</span>
+              <span style="text-align: start;float: start;margin: 2px;">{{c.text}}</span>
               <div style="display: flex; flex-direction: row;margin: 7px 0 7px auto; justify-content: end;">
                 <el-button icon="el-icon-edit" size="small" @click="noFollowComment"></el-button>
                 <el-button type="primary" icon="el-icon-star-off" size="small" ></el-button>
@@ -81,7 +81,6 @@
           <span class="mainTitle" style="text-align: start; float: left;">视频信息</span>
           <span class="desc">播放：{{this.video.pv}}</span>
           <span class="desc">收藏：1w</span>
-<!--          <span class="desc">评论：1w</span>-->
         </div>
         <div class="subInfo">
           <span class="mainTitle" style="text-align: start; float: left;">分类</span>
@@ -252,12 +251,16 @@ export default {
       },
       comment: [{
         author: {
-          avatar: '',
-          nickname: '',
+          avatar: 'http://192.168.127.130:4869/bef355eeca78a0342527e7fccb189f41',
+          nickname: 'MTgwNDUzNj',
           level: 1
         },
-        text: '',
-        createTime: ''
+        text: '这个视频真实太傻掉了',
+        time: new Date(),
+        parseTime: (time) => {
+          const now = time
+          return now.getFullYear().toString() + '/' + (now.getMonth() + 1).toString() + '/' + now.getDate().toString() + ' ' + now.getHours() + ':' + now.getMinutes()
+        }
       }],
       barrageText: ''
     }
@@ -298,6 +301,22 @@ export default {
         message: '评论回复功能暂不支持~',
         type: 'error'
       });
+    },
+    submitComment: function () {
+      console.log(JSON.parse(this.$store.state.userInfo))
+      this.$data.comment.push({
+        author: {
+          avatar: 'http://192.168.127.130:4869/' + JSON.parse(this.$store.state.userInfo).user_avatar,
+          nickname: JSON.parse(this.$store.state.userInfo).nick_name,
+          level: 1
+        },
+        text: this.$data.inputComment,
+        time: new Date(),
+        parseTime: (time) => {
+          const now = time
+          return now.getFullYear().toString() + '/' + (now.getMonth() + 1).toString() + '/' + now.getDate().toString() + ' ' + now.getHours() + ':' + now.getMinutes()
+        }
+      })
     }
   }
 }

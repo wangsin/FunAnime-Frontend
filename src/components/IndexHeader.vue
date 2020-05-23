@@ -8,7 +8,7 @@
       <el-dropdown @command="toLink">
         <span class="el-dropdown-link">{{ JSON.parse($store.state.userInfo).nick_name }}</span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item>个人中心</el-dropdown-item>
+          <el-dropdown-item :command="() => {$router.push('/post')}">视频管理</el-dropdown-item>
           <el-dropdown-item :command="() => {$router.push('/post')}">创作视频</el-dropdown-item>
           <el-dropdown-item>我的收藏</el-dropdown-item>
           <el-dropdown-item :command="() => {$router.push('/supple')}">信息完善</el-dropdown-item>
@@ -22,7 +22,7 @@
     </el-menu-item>
     <el-menu-item class="menu-right">
       <el-input placeholder="Just Search" v-model="searchData" class="input-with-select">
-        <el-button slot="append" icon="el-icon-search"></el-button>
+        <el-button slot="append" icon="el-icon-search" @click="handleSearch"></el-button>
       </el-input>
     </el-menu-item>
   </el-menu>
@@ -62,6 +62,12 @@ export default {
     }
   },
   methods: {
+    handleSearch: function () {
+      let newPage = this.$router.resolve({
+        path: '/search?key=' + this.$data.searchData
+      })
+      window.open(newPage.href, '_blank')
+    },
     pushNewTab: function () {
       let newPage = this.$router.resolve({
         path: '/login'

@@ -1,15 +1,7 @@
 <template>
   <div>
-    <el-container class="indexRoot">
-      <div class="card">
-        <el-carousel class="mainCard" trigger="click" height="620px" indicator-position="outside">
-          <el-carousel-item v-for="(item, k) in carouseList" :key="k">
-            <img :src="item.true_img" @click="toVideo(item.video_id)" alt="material">
-          </el-carousel-item>
-        </el-carousel>
-      </div>
-    </el-container>
     <div class="top">
+      <div style="margin: 20px;text-align: start;font-size: 30px;font-weight: bold;">搜索结果</div>
       <el-row :gutter="20" class="subCard"
               style="margin-left: 0;margin-right: 0;"
               v-infinite-scroll="load"
@@ -35,7 +27,7 @@
 import * as configApi from '../api/config'
 
 export default {
-  name: 'IndexBody',
+  name: 'SearchPage',
   beforeMount: function () {
     configApi.getBasicConfig().then((resp) => {
       if (resp.errno !== 0) {
@@ -51,6 +43,7 @@ export default {
       params: {
         page: this.$data.page,
         size: this.$data.size,
+        title: this.$route.query.key,
         category: 0
       }
     }).then((resp) => {
@@ -79,7 +72,8 @@ export default {
       size: 16,
       count: 0,
       videos: [],
-      loading: false
+      loading: false,
+      title: ''
     }
   },
   computed: {

@@ -12,8 +12,13 @@ export default new Router({
     },
     {
       path: '/list/:type',
-      name: 'AnimePage',
-      component: () => import(/* webpackChunkName: "video" */ '@/components/VListPage')
+      name: 'CategoryPage',
+      component: () => import(/* webpackChunkName: "video" */ '@/components/ListPage')
+    },
+    {
+      path: '/search',
+      name: 'SearchPage',
+      component: () => import(/* webpackChunkName: "video" */ '@/components/SearchPage')
     },
     {
       path: '/login',
@@ -29,6 +34,22 @@ export default new Router({
       path: '/supple',
       name: 'SupplePage',
       component: () => import(/* webpackChunkName: "video" */ '@/components/SupplePage'),
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/videoList',
+      name: 'VideoUserList',
+      component: () => import('@/components/VideoUserList'),
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/collectList',
+      name: 'CollectList',
+      component: () => import('@/components/CollectList'),
       meta: {
         requiresAuth: true
       }

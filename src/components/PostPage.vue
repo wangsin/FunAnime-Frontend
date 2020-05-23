@@ -17,13 +17,11 @@
             <el-input v-model="form.name" placeholder="请填写视频标题，字数控制在20字以内~"></el-input>
           </el-form-item>
           <el-form-item v-if="checkStep(1)" label="分区">
-            <el-select v-model="form.region" placeholder="请选择一级分区">
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
+            <el-select v-model="form.region1" placeholder="请选择一级分区">
+              <el-option v-for="(c,k) in category" :label="c.label" :value="c.id" :key="k"></el-option>
             </el-select>
-            <el-select v-model="form.region" placeholder="请选择二级分区">
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
+            <el-select v-model="form.region2" placeholder="请选择二级分区">
+              <el-option v-for="(c,k) in subCategory" :label="c.label" :value="c.id" :key="k"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item v-if="checkStep(1)" label="视频描述">
@@ -33,28 +31,31 @@
             <input type="file" style="display:none;" ref="videoFile" @change="setVideoName"/>
             <input type="file" style="display:none;" ref="videoCover" @change="setCover"/>
           </div>
-          <el-form-item v-if="checkStep(2)" label="视频">
-            <div style="margin-left: 20px;">
-              <el-button icon="el-icon-upload2" class="submitButton" @click="selectVideo">
-                <span style="font-size: 20px;">点击选择视频</span>
-                <br>
-              </el-button>
-              <el-button class="submitButton" disabled>{{ this.$data.form.fileName || "请选择mp4,mkv,avi等合适的视频格式~" }}</el-button>
-            </div>
-          </el-form-item>
-          <el-form-item v-if="checkStep(2)" label="封面">
-            <div style="margin-left: 20px;">
-              <el-button icon="el-icon-upload2"  class="submitButton" @click="selectCover">
-                <span style="font-size: 20px;">点击选择封面</span>
-              </el-button>
-              <el-button class="submitButton" @click="uploadVideo">{{ this.$data.form.coverFileName || "请选择jpg,png等合适的图片格式~" }}</el-button>
-            </div>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" v-if="canLast()" @click="lastStep" plain>上一步</el-button>
-            <el-button type="primary" v-if="!canSubmit()" @click="nextStep">下一步</el-button>
-            <el-button type="primary" v-if="canSubmit()" @click="onSubmit">提交</el-button>
-          </el-form-item>
+          <div v-loading="isLoading()">
+            <el-form-item v-if="checkStep(2)" label="视频">
+              <div style="margin-left: 20px;">
+                <el-button icon="el-icon-upload2" class="submitButton" @click="selectVideo">
+                  <span style="font-size: 20px;">点击选择视频</span>
+                  <br>
+                </el-button>
+                <el-button class="submitButton" disabled>{{ this.$data.form.fileName || "请选择mp4,mkv,avi等合适的视频格式~" }}</el-button>
+              </div>
+            </el-form-item>
+            <el-form-item v-if="checkStep(2)" label="封面">
+              <div style="margin-left: 20px;">
+                <el-button icon="el-icon-upload2" class="submitButton" @click="selectCover">
+                  <span style="font-size: 20px;">点击选择封面</span>
+                </el-button>
+                <el-button class="submitButton" disabled>{{ this.$data.form.coverFileName || "请选择jpg,png等合适的图片格式~" }}</el-button>
+              </div>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" v-if="this.$data.step !== 1" @click="lastStep" plain>上一步</el-button>
+              <el-button type="primary" v-if="this.$data.step === 1" @click="nextStep">下一步</el-button>
+              <el-button type="primary" v-if="this.$data.step === 2" @click="uploadVideo(form.name, form.desc)">提交</el-button>
+              <el-button type="primary" v-if="this.$data.step === 3" @click="$router.push('/')">返回主页</el-button>
+            </el-form-item>
+          </div>
         </el-form>
       </div>
     </div>
@@ -82,7 +83,24 @@ export default {
   data () {
     return {
       step: 1,
+      videoName: '',
+      videoDesc: '',
       uploaderInfos: [],
+      uploading: false,
+      category: [{
+        id: '1',
+        label: '动漫'
+      }, {
+        id: '4',
+        label: '科技'
+      }],
+      subCategory: [{
+        id: '2',
+        label: '沙雕配音'
+      }, {
+        id: '3',
+        label: 'OVA'
+      }],
       form: {
         name: '',
         fileName: '',
@@ -99,6 +117,9 @@ export default {
     }
   },
   methods: {
+    isLoading: function () {
+      return this.$data.uploading
+    },
     selectVideo: function () {
       this.$refs.videoFile.click()
     },
@@ -112,29 +133,23 @@ export default {
       this.$data.form.coverFileName = this.$refs.videoCover.files[0].name
     },
     /* eslint-disable */
-    uploadVideo: function () {
-      let mediaFile = this.$refs.videoFile.files[0];
-      let coverFile = this.$refs.videoCover.files[0];
+    uploadVideo: function (name, desc) {
+      let self = this;
+      this.uploading = true
+      var mediaFile = this.$refs.videoFile.files[0];
+      var coverFile = this.$refs.videoCover.files[0];
 
-      let uploader = this.tcVod.upload({
+      var uploader = this.tcVod.upload({
         mediaFile: mediaFile,
         coverFile: coverFile
-      });
+      })
+
       uploader.on("media_progress", function(info) {
         uploaderInfo.progress = info.percent;
-      });
-      uploader.on("media_upload", function(info) {
-        uploaderInfo.isVideoUploadSuccess = true;
-      });
-      uploader.on("cover_progress", function(info) {
-        uploaderInfo.coverProgress = info.percent;
-      });
-      uploader.on("cover_upload", function(info) {
-        uploaderInfo.isCoverUploadSuccess = true;
-      });
-      console.log(uploader, "uploader");
+        this.uploading = true
+      })
 
-      let uploaderInfo = {
+      var uploaderInfo = {
         videoInfo: uploader.videoInfo,
         coverInfo: uploader.coverInfo,
         isVideoUploadSuccess: false,
@@ -149,20 +164,44 @@ export default {
           uploaderInfo.isVideoUploadCancel = true;
           uploader.cancel();
         }
-      };
+      }
 
-      this.uploaderInfos.push(uploaderInfo);
+      this.uploaderInfos.push(uploaderInfo)
 
       uploader
         .done()
-        .then(function(doneResult) {
-          console.log("doneResult", doneResult);
+        .then((doneResult) => {
+            console.log("doneResult", doneResult);
+            uploaderInfo.fileId = doneResult.fileId;
+            uploaderInfo.coverUrl = doneResult.cover.url;
 
-          uploaderInfo.fileId = doneResult.fileId;
+            configApi.uploadVideo({
+              "remote_id": uploaderInfo.fileId,
+              "category_top": 1,
+              "category_top_desc": "动画",
+              "category_next": 2,
+              "category_next_desc": "沙雕配音",
+              "name": name,
+              "desc": desc,
+              "cover_img": "5d88693b5749a36a6750f50d4ad90ee8",
+            }).then((resp) => {
+              console.log("create")
+              this.uploading = false
+              this.$notify.info({
+                'title': '上传成功',
+                'message': ''
+              })
+              this.nextStep()
+            }).catch(() => {
+              this.uploading = false
+              this.$notify.error({
+                'title': '保存失败',
+                'message': '请重试'
+              })
+            })
+          }).catch(() => {
+          })
 
-          uploaderInfo.coverUrl = doneResult.cover.url;
-          console.log()
-        }).catch()
     },
     canLast: function () {
       return this.$data.step !== 1
@@ -181,6 +220,14 @@ export default {
       }
     },
     nextStep: function () {
+      if (this.$data.name === '' || this.$data.region1 === 0 || this.$data.region2 === 0 || this.$data.desc === '') {
+        this.$notify.error({
+          title: '请完善信息',
+          message: '确认信息后重试'
+        })
+        return
+      }
+
       if (this.$data.step < 3) {
         this.$data.step += 1
       } else {

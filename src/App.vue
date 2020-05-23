@@ -16,7 +16,6 @@ export default {
   components: {IndexHeader, FooterPage},
   methods: {
     controlHeader: function () {
-      console.log(this.$router.path)
       return this.$router.history.current.fullPath !== '/login'
     }
   }

@@ -1,14 +1,5 @@
 <template>
   <div>
-    <el-container class="indexRoot">
-      <div class="card">
-        <el-carousel class="mainCard" trigger="click" height="620px" indicator-position="outside">
-          <el-carousel-item v-for="(item, k) in carouseList" :key="k">
-            <img :src="item.true_img" @click="toVideo(item.video_id)" alt="material">
-          </el-carousel-item>
-        </el-carousel>
-      </div>
-    </el-container>
     <div class="top">
       <el-row :gutter="20" class="subCard"
               style="margin-left: 0;margin-right: 0;"
@@ -35,14 +26,14 @@
 import * as configApi from '../api/config'
 
 export default {
-  name: 'IndexBody',
+  name: 'ListPage',
   beforeMount: function () {
     configApi.getBasicConfig().then((resp) => {
       if (resp.errno !== 0) {
         this.$data.carouseList = []
         return
       }
-      this.$data.carouseList = resp.data.carousel_img
+      this.$data.carouseList = resp.data.video_list
     }).catch((err) => {
       console.log(err)
     })
