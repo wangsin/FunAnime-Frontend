@@ -7,8 +7,8 @@
               infinite-scroll-disabled="disabled"
               infinite-scroll-distance="0">
         <el-col :xs="24" :sm="6" :md="6" v-for="(video, i) in videoList" :key="i">
-          <el-card :body-style="{ padding: '0px' }" shadow="hover" style="margin-bottom: 20px;cursor: pointer;">
-            <img @click="toVideo(video.video_id)" :src="video.true_img" class="image">
+          <el-card :body-style="{ padding: '0px' }" shadow="hover" style="margin-bottom: 20px;cursor: pointer;height: 345px;">
+            <img style="width: 100%;" @click="toVideo(video.video_id)" :src="video.true_img" class="image">
             <div @click="toVideo(video.video_id)" style="padding: 14px; display: flex; flex-direction: column;">
               <span style="font-size: 15px;text-align: left">{{video.title}}</span>
               <time class="time">播放量：{{video.volume}} 投稿时间：{{video.date}}</time>
@@ -28,6 +28,9 @@ import * as configApi from '../api/config'
 export default {
   name: 'ListPage',
   beforeMount: function () {
+    console.log('beforeMount')
+    console.log(this.$route.params.type)
+    this.$data.videoList = []
     configApi.getBasicConfig().then((resp) => {
       if (resp.errno !== 0) {
         this.$data.carouseList = []
@@ -42,7 +45,7 @@ export default {
       params: {
         page: this.$data.page,
         size: this.$data.size,
-        category: 0
+        category: this.$route.params.type
       }
     }).then((resp) => {
       if (resp.errno !== 0) {

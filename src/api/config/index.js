@@ -16,6 +16,12 @@ const uploadCover = (form, config) => axios.post('http://192.168.127.130:4869/up
 
 const uploadVideo = (form) => axios.post('/funanime/server/api/outer/video/manage/upload', form).then(res => res.data)
 
+const collectVideo = (form) => axios.post('/funanime/server/api/outer/video/operate/collect', form).then(res => res.data)
+
+const uncollectVideo = (form) => axios.post('/funanime/server/api/outer/video/operate/unCollect', form).then(res => res.data)
+
+const collectionList = options => axios.get('/funanime/server/api/outer/video/operate/collectList', options).then(res => res.data)
+
 export {
   getBasicConfig,
   getVideoList,
@@ -24,5 +30,8 @@ export {
   initVideoBarrage,
   getVideoUploadSign,
   uploadCover,
-  uploadVideo
+  uploadVideo,
+  collectVideo,
+  uncollectVideo,
+  collectionList
 }

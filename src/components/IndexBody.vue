@@ -2,22 +2,22 @@
   <div>
     <el-container class="indexRoot">
       <div class="card">
-        <el-carousel class="mainCard" trigger="click" height="620px" indicator-position="outside">
+        <el-carousel class="mainCard" trigger="click" height="700px" indicator-position="outside">
           <el-carousel-item v-for="(item, k) in carouseList" :key="k">
-            <img :src="item.true_img" @click="toVideo(item.video_id)" alt="material">
+            <img style="width: 100%;" :src="item.true_img" @click="toVideo(item.video_id)" alt="material">
           </el-carousel-item>
         </el-carousel>
       </div>
     </el-container>
     <div class="top">
-      <el-row :gutter="20" class="subCard"
+      <el-row :gutter="10" class="subCard"
               style="margin-left: 0;margin-right: 0;"
               v-infinite-scroll="load"
               infinite-scroll-disabled="disabled"
               infinite-scroll-distance="0">
         <el-col :xs="24" :sm="6" :md="6" v-for="(video, i) in videoList" :key="i">
-          <el-card :body-style="{ padding: '0px' }" shadow="hover" style="margin-bottom: 20px;cursor: pointer;">
-            <img @click="toVideo(video.video_id)" :src="video.true_img" class="image">
+          <el-card :body-style="{ padding: '0px' }" shadow="hover" style="margin-bottom: 20px;cursor: pointer;height: 345px;">
+            <img style="width: 100%;" @click="toVideo(video.video_id)" :src="video.true_img" class="image">
             <div @click="toVideo(video.video_id)" style="padding: 14px; display: flex; flex-direction: column;">
               <span style="font-size: 15px;text-align: left">{{video.title}}</span>
               <time class="time">播放量：{{video.volume}} 投稿时间：{{video.date}}</time>
@@ -186,6 +186,6 @@ a{
 }
 
 .top {
-  margin: 30px 100px 30px 100px;
+  margin: 30px 13% 30px 13%;
 }
 </style>

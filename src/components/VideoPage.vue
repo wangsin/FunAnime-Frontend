@@ -23,7 +23,7 @@
       <video id="player-container-id" preload="auto" playsinline webkit-playsinline controls></video>
     </div>
     <div class="barrageArea">
-      <el-input v-model="barrageText" placeholder="请输入弹幕~"></el-input>
+      <el-input v-model="barrageText" placeholder="请输入弹幕~" @keyup.enter.native="submitBarrage"></el-input>
       <el-color-picker class="barBtn" v-model="barrageColor"></el-color-picker>
       <el-button @click="submitBarrage" class="barBtn" >发射</el-button>
     </div>
@@ -72,8 +72,8 @@
       <el-col :span="6" class="comment">
         <div class="subInfo">
           <el-button-group style="width: 100%;">
-            <el-button v-if="this.video.isCollect" type="primary" icon="el-icon-star-on" plain>取消收藏</el-button>
-            <el-button v-else type="primary" icon="el-icon-star-off">收藏</el-button>
+            <el-button v-if="this.video.isCollect" type="primary" icon="el-icon-star-on" @click="uncollect" plain>取消收藏</el-button>
+            <el-button v-else type="primary" icon="el-icon-star-off" @click="collect">收藏</el-button>
             <el-button type="primary" icon="el-icon-share">分享</el-button>
           </el-button-group>
         </div>
@@ -251,8 +251,8 @@ export default {
       },
       comment: [{
         author: {
-          avatar: 'http://192.168.127.130:4869/bef355eeca78a0342527e7fccb189f41',
-          nickname: 'MTgwNDUzNj',
+          avatar: 'http://192.168.127.130:4869/5a7e1f23a2db5512896fb0a97fb4fbbc',
+          nickname: 'TestUser',
           level: 1
         },
         text: '这个视频真实太傻掉了',
@@ -266,6 +266,46 @@ export default {
     }
   },
   methods: {
+    collect: function () {
+      configApi.collectVideo({
+        video_id: parseInt(this.$data.video.videoId)
+      }).then((res) => {
+        if (res.errno !== 0) {
+          this.$notify.error({
+            title: '发送失败',
+            message: res.errmsg
+          })
+        } else {
+          this.$data.video.isCollect = true
+        }
+      }).catch((error) => {
+        console.log(error)
+        this.$notify.error({
+          title: '发送失败',
+          message: '服务器开小差了，请稍后再试~'
+        })
+      })
+    },
+    uncollect: function () {
+      configApi.uncollectVideo({
+        video_id: parseInt(this.$data.video.videoId)
+      }).then((res) => {
+        if (res.errno !== 0) {
+          this.$notify.error({
+            title: '发送失败',
+            message: res.errmsg
+          })
+        } else {
+          this.$data.video.isCollect = false
+        }
+      }).catch((error) => {
+        console.log(error)
+        this.$notify.error({
+          title: '发送失败',
+          message: '服务器开小差了，请稍后再试~'
+        })
+      })
+    },
     submitBarrage: function () {
       if (!conn) {
         this.$notify.error({
@@ -304,7 +344,7 @@ export default {
     },
     submitComment: function () {
       console.log(JSON.parse(this.$store.state.userInfo))
-      this.$data.comment.push({
+      this.$data.comment.unshift({
         author: {
           avatar: 'http://192.168.127.130:4869/' + JSON.parse(this.$store.state.userInfo).user_avatar,
           nickname: JSON.parse(this.$store.state.userInfo).nick_name,

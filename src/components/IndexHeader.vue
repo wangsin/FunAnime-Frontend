@@ -8,17 +8,17 @@
       <el-dropdown @command="toLink">
         <span class="el-dropdown-link">{{ JSON.parse($store.state.userInfo).nick_name }}</span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item :command="() => {$router.push('/post')}">视频管理</el-dropdown-item>
+          <el-dropdown-item :command="() => {$router.push('/videoList')}">视频管理</el-dropdown-item>
           <el-dropdown-item :command="() => {$router.push('/post')}">创作视频</el-dropdown-item>
-          <el-dropdown-item>我的收藏</el-dropdown-item>
-          <el-dropdown-item :command="() => {$router.push('/supple')}">信息完善</el-dropdown-item>
+          <el-dropdown-item :command="() => {$router.push('/collectList')}">我的收藏</el-dropdown-item>
+<!--          <el-dropdown-item :command="() => {$router.push('/supple')}">信息完善</el-dropdown-item>-->
           <el-dropdown-item :command="() => {$store.commit('set_offline')}" divided>注销</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </el-menu-item>
     <el-menu-item v-else class="menu-right">
       <el-button type="primary" @click="$router.push('/register')" plain>注册</el-button>
-      <el-button type="primary" @click="pushNewTab()">登录</el-button>
+      <el-button type="primary" @click="pushNewTab('/login')">登录</el-button>
     </el-menu-item>
     <el-menu-item class="menu-right">
       <el-input placeholder="Just Search" v-model="searchData" class="input-with-select">
@@ -68,9 +68,9 @@ export default {
       })
       window.open(newPage.href, '_blank')
     },
-    pushNewTab: function () {
+    pushNewTab: function (path) {
       let newPage = this.$router.resolve({
-        path: '/login'
+        path: path
       })
       window.open(newPage.href, '_blank')
     },

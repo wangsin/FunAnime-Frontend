@@ -20,17 +20,17 @@
           </el-table-column>
           <el-table-column label="封面图" width="150px" align="center">
             <template slot-scope="{row}">
-              <img :src="row.true_img" alt="head" style="width: 100%;">
+              <img :src="row.video_pic" alt="head" style="width: 100%;">
             </template>
           </el-table-column>
           <el-table-column label="视频标题">
             <template slot-scope="scope">
-              {{ scope.row.title }}
+              {{ scope.row.video_name }}
             </template>
           </el-table-column>
           <el-table-column label="操作" align="center" width="180" class-name="small-padding fixed-width">
             <template slot-scope="{row,$index}">
-              <el-button type="danger" size="mini">
+              <el-button type="danger" size="mini" @click="uncollect(row.video_id)">
                 取消收藏
               </el-button>
             </template>
@@ -42,18 +42,19 @@
 </template>
 
 <script>
+/* eslint-disable */
   import * as configApi from '../api/config'
   export default {
     name: 'CollectList',
     beforeMount: function () {
       console.log('start request')
-      configApi.getVideoManageList({}).then((resp) => {
+      configApi.collectionList({}).then((resp) => {
         console.log(resp)
         if (resp.errno !== 0) {
           this.$data.list = []
           return
         }
-        this.$data.list = resp.data.video_list
+        this.$data.list = resp.data.collect_list
         this.$data.count = resp.data.page_data.count
       }).catch((err) => {
         console.log(err)
@@ -86,6 +87,39 @@
         size: 100,
         count: 1
       }
+    },
+    methods: {
+      uncollect: function (video_id) {
+        configApi.uncollectVideo({
+          video_id: parseInt(video_id)
+        }).then((res) => {
+          if (res.errno !== 0) {
+            this.$notify.error({
+              title: '发送失败',
+              message: res.errmsg
+            })
+          } else {
+            this.$data.list = []
+            configApi.collectionList({}).then((resp) => {
+              console.log(resp)
+              if (resp.errno !== 0) {
+                this.$data.list = []
+                return
+              }
+              this.$data.list = resp.data.collect_list
+              this.$data.count = resp.data.page_data.count
+            }).catch((err) => {
+              console.log(err)
+            })
+          }
+        }).catch((error) => {
+          console.log(error)
+          this.$notify.error({
+            title: '发送失败',
+            message: '服务器开小差了，请稍后再试~'
+          })
+        })
+      },
     }
   }
 </script>

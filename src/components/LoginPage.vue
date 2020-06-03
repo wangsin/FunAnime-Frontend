@@ -27,7 +27,6 @@
 
 <script>
 import * as userApi from '../api/user'
-import {encrypt} from '../util/encrypt'
 import * as API from '@/api/user/'
 
 export default {
@@ -96,7 +95,7 @@ export default {
     login: function () {
       userApi.login({
         phone: this.phone,
-        password: encrypt(this.password),
+        password: this.password,
         smsCode: this.verifyCode
       }).then((resp) => {
         if (resp.errno !== 0) {
